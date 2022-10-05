@@ -43,7 +43,7 @@ def create_logging(log_dir, filemode):
 
     while os.path.isfile(os.path.join(log_dir, '{:04d}.log'.format(i1))):
         i1 += 1
-        
+
     log_path = os.path.join(log_dir, '{:04d}.log'.format(i1))
     logging.basicConfig(
         level=logging.DEBUG,
@@ -58,17 +58,8 @@ def create_logging(log_dir, filemode):
     formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
     console.setFormatter(formatter)
     logging.getLogger('').addHandler(console)
-    
+
     return logging
-
-
-def get_metadata(audio_names, audio_paths):
-    meta_dict = {
-        'audio_name': audio_names, 
-        'audio_path': audio_paths, 
-        'fold': np.arange(len(audio_names))}
-
-    return meta_dict
 
 
 def float32_to_int16(x):
@@ -88,7 +79,7 @@ class StatisticsContainer(object):
         self.statistics_path = statistics_path
 
         self.backup_statistics_path = '{}_{}.pkl'.format(
-            os.path.splitext(self.statistics_path)[0], 
+            os.path.splitext(self.statistics_path)[0],
             datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
         self.statistics_dict = {'validate': []}
@@ -96,23 +87,23 @@ class StatisticsContainer(object):
     def append(self, iteration, statistics, data_type):
         statistics['iteration'] = iteration
         self.statistics_dict[data_type].append(statistics)
-        
+
     def dump(self):
         pickle.dump(self.statistics_dict, open(self.statistics_path, 'wb'))
         pickle.dump(self.statistics_dict, open(self.backup_statistics_path, 'wb'))
         logging.info('    Dump statistics to {}'.format(self.statistics_path))
         logging.info('    Dump statistics to {}'.format(self.backup_statistics_path))
-        
+
     def load_state_dict(self, resume_iteration):
         self.statistics_dict = pickle.load(open(self.statistics_path, 'rb'))
 
         resume_statistics_dict = {'validate': []}
-        
+
         for key in self.statistics_dict.keys():
             for statistics in self.statistics_dict[key]:
                 if statistics['iteration'] <= resume_iteration:
                     resume_statistics_dict[key].append(statistics)
-                
+
         self.statistics_dict = resume_statistics_dict
 
 

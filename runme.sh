@@ -1,11 +1,11 @@
 #!bin/bash
 
-DATASET_DIR="/home/tiger/datasets/GTZAN/dataset_root"
-WORKSPACE="/home/tiger/workspaces/panns_transfer_to_gtzan"
+DATASET_DIR="/import/c4dm-datasets/PiJAMA"
+WORKSPACE="/homes/ace01/pijama_experiments/panns_transfer_to_gtzan"
 
-python3 utils/features.py pack_audio_files_to_hdf5 --dataset_dir=$DATASET_DIR --workspace=$WORKSPACE --mini_data
+python3 utils/pijama_features.py pack_audio_files_to_hdf5 --dataset_dir=$DATASET_DIR --workspace=$WORKSPACE
 
-PRETRAINED_CHECKPOINT_PATH="/home/tiger/released_models/sed/Cnn14_mAP=0.431.pth"
+PRETRAINED_CHECKPOINT_PATH="${WORKSPACE}/Cnn14_mAP=0.431.pth"
 
 CUDA_VISIBLE_DEVICES=3 python3 pytorch/main.py train --dataset_dir=$DATASET_DIR --workspace=$WORKSPACE --holdout_fold=1 --model_type="Transfer_Cnn14" --pretrained_checkpoint_path=$PRETRAINED_CHECKPOINT_PATH --loss_type=clip_nll --augmentation='mixup' --learning_rate=1e-4 --batch_size=32 --resume_iteration=0 --stop_iteration=10000 --cuda
 
